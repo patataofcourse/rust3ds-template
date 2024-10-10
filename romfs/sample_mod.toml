@@ -1,0 +1,96 @@
+[info]
+name = "Mod Name"
+author = "Me!"
+version = "1.0"
+description = "this is a mod"
+contributors = ["Person 1", "Person 2"]
+languages = ["us_en", "eu_en"]
+
+[requirements]
+version = "0.3"
+"Remix 9 Wii Cellanims" = "1.0" #dependency naming is still a wip, don't mind it too hard
+
+[code]
+# this section is still a WIP lol
+
+[[tickflow.game]]
+name = "ctrModName"
+tickflow = "tickflow/ctrModName.btk"
+default_index = 0
+music = "funy_music.aac"
+
+# replaces the tickflow in a specified address
+[[tickflow.patch]]
+tickflow = "tickflow/customPatch.btk"
+pos_us = 0x696969
+pos_eu = 0x696970
+
+
+# land naming notes
+# - lands are called "stage" internally
+# - lush woods and mamarin palace are counted as lands
+# - earth world lands are prefixed with "gr" in string names (e.g. stage_gr00)
+# - heaven world lands are counted separately from earth world lands, and are prefixed with "sk" in string names (e.g stage_sk00)
+# - lush woods is internally stage_grLED
+# - mamarin palace is internally stage_skTED
+# - although not relevant here, in SFX lands are simply called STAGE_00 - STAGE_11 (with 0 being honeybee land and 11 being mamarin palace)
+[[tickflow.land]]
+name = "gr19"
+default_position = 0
+fs = "stage19"
+
+game1.tickflow = "tickflow/stage19/agbSmth.btk"
+game1.name = "agbSmth"
+
+game2.tickflow = "tickflow/stage19/ntrSmth.btk"
+game2.name = "ntrSmth"
+
+game3.tickflow = "tickflow/stage19/rvlSmth.btk"
+game3.name = "rvlSmth"
+
+game4.tickflow = "tickflow/stage19/ctrSmth.btk"
+game4.name = "ctrSmth"
+
+# tower naming notes
+# - towers are called "room" internally
+# - lush tower is internally room_LED
+# - tibby's mom is internally room_TED
+[[tickflow.tower]]
+name = "room_90"
+default_position = 0
+
+game1.tickflow = "tickflow/room90/agbSmth.btk"
+game1.name = "agbSmth"
+game1.fs = "room90/agbSmth"
+
+game2.tickflow = "tickflow/room90/ntrSmth.btk"
+game2.name = "ntrSmth"
+game2.fs = "room90/ntrSmth"
+
+game3.tickflow = "tickflow/room90/rvlSmth.btk"
+game3.name = "rvlSmth"
+game3.fs = "room90/rvlSmth"
+
+game4.tickflow = "tickflow/room90/ctrSmth.btk"
+game4.name = "ctrSmth"
+game4.fs = "room90/ctrSmth"
+
+remix.tickflow = "tickflow/room90/remixSmth.btk"
+remix.name = "remixSmth"
+remix.fs = "room90/remixSmth"
+
+# gate naming notes
+# - the name of the game the gate has (e.g. ntrCoinToss) is completely independent from the name of the gate itself (e.g. gate_00)
+# - gate naming order is as you'd expect
+[[tickflow.gate]]
+name = "gate_69"
+game_name = "ctrSomeGate"
+default_position = 2
+fixed = true
+
+# TODO: maybe make those tickflow.easy for example?
+tickflow_easy = "tickflow/ctrSomeGate/easy.btk"
+tickflow_medium = "tickflow/ctrSomeGate/easy.btk"
+tickflow_hard = "tickflow/ctrSomeGate/easy.btk"
+tickflow_endless = "tickflow/ctrSomeGate/easy.btk"
+tickflow_practice = "tickflow/ctrSomeGate/easy.btk"

@@ -8,9 +8,7 @@ use ctru::{
 };
 use error::error_applet;
 use std::{
-    panic::{self, PanicHookInfo},
-    process,
-    time::Duration,
+    fmt::Display, io::Read, panic::{self, PanicHookInfo}, process
 };
 use ui_lib::{BaristaUI, Screen};
 
@@ -82,10 +80,7 @@ fn main() {
                 Error::Other(c) => c,
             };
             if is_citra {
-                let gfx = Gfx::new().unwrap();
-                let _ = ctru::console::Console::new(gfx.bottom_screen.borrow_mut());
-                println!("Error: {}\n\nExiting in 20 seconds...", error);
-                std::thread::sleep(Duration::from_secs(20));
+                citra_error(error);
             } else {
                 error_applet(error);
             }
@@ -107,6 +102,12 @@ fn run(is_citra: bool) -> error::Result<()> {
 
     // Initialize GFX stuff
     let mut ui = BaristaUI::init();
+
+    // TODO: proper mod manifest support rather than... this.
+    let mut f = std::fs::File::open("romfs:/sample_mod.toml")?;
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    toml::from_str::<format::manifest::ModManifest>(&s)?;
 
     ui.set_scene(Screen::Top, scene::top_screen_scene);
 
@@ -252,10 +253,7 @@ fn citra_panic_hook(info: &PanicHookInfo) {
             .collect::<Vec<_>>()
     ); */
 
-    println!("{}", panic_message(info));
-
-    println!("\nExiting in 20 seconds...");
-    std::thread::sleep(Duration::from_secs(20));
+    citra_error(panic_message(info));
 
     process::exit(1);
 }
@@ -274,4 +272,23 @@ fn panic_message(info: &PanicHookInfo) -> String {
     } else {
         format!("panic{}\0", location_info)
     }
+}
+
+fn citra_error(message: impl Display) {
+    let apt = Apt::new().unwrap();
+    let gfx = Gfx::new().ok();
+
+    // it's possible GFX is already initialized soooo
+    let console = gfx.as_ref().map(|c| Console::new(c.bottom_screen.borrow_mut()));
+
+    println!("{}", message);
+    
+    while apt.main_loop() {
+        unsafe {
+            use ctru_sys::*;
+            gspWaitForEvent(GSPGPU_EVENT_VBlank0, true);
+        }
+    }
+
+    drop(console);
 }

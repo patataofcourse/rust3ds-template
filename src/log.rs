@@ -12,11 +12,10 @@ pub enum Log {
 #[cfg(debug_assertions)]
 impl Display for Log {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(
-            match self {
-                Log::General => "general",
-                Log::Audio => "audio",
-            })
+        f.write_str(match self {
+            Log::General => "general",
+            Log::Audio => "audio",
+        })
     }
 }
 
@@ -36,6 +35,7 @@ macro_rules! log {
 
         let mut log = $crate::log::LOG.lock().unwrap();
         *log += &out;
+        drop(log);
     };
 }
 
