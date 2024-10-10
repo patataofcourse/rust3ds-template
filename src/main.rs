@@ -153,7 +153,7 @@ fn run(is_citra: bool) -> error::Result<()> {
         audio_player = audio::AudioManager::new();
 
         // Initial values for audio player
-        audio_player.load("romfs:/audio/strm/bartender_construction.bcstm".to_string());
+        audio_player.load("romfs:/audio/strm/Practice.bcstm".to_string());
         audio_player.play();
 
         unsafe { AUDIO = Some(&audio_player) }
@@ -280,6 +280,7 @@ fn citra_error(message: impl Display) {
 
     // it's possible GFX is already initialized soooo
     let console = gfx.as_ref().map(|c| Console::new(c.bottom_screen.borrow_mut()));
+    unsafe { ctru_sys::consoleClear() }
 
     println!("{}", message);
     
