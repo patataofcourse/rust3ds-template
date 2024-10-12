@@ -1,6 +1,5 @@
-#![allow(unused)]
+//TODO: repurpose all of this to work with the PCM16 stuff instead
 
-use crate::format::bcstm::BCSTMFile;
 use std::{
     sync::mpsc::{self, Receiver, Sender},
     thread,
@@ -13,6 +12,7 @@ pub struct AudioManager {
     is_playing: bool,
 }
 
+#[allow(dead_code)]
 impl AudioManager {
     pub fn new() -> Self {
         let (tx, rx) = mpsc::channel();
@@ -60,8 +60,9 @@ impl Drop for AudioManager {
     }
 }
 
+#[allow(unused)]
 struct AudioContext {
-    pub bcstm: Option<BCSTMFile>,
+    pub bcstm: Option<()>,
     pub playing: bool,
     pub rx: Receiver<AudioMessage>,
 }
@@ -89,15 +90,15 @@ fn audio_main(rx: Receiver<AudioMessage>) {
             .unwrap_or(AudioMessage::None);
 
         match msg {
-            AudioMessage::LoadFile(c) => ctx.bcstm = Some(BCSTMFile::open_from_file(c).unwrap()),
+            AudioMessage::LoadFile(_c) => ctx.bcstm = Some(()),
             AudioMessage::Play => {
-                if let Some(ref mut c) = ctx.bcstm {
-                    c.play()
+                if let Some(ref mut _c) = ctx.bcstm {
+                    //TODO
                 }
             }
             AudioMessage::Pause => {
-                if let Some(ref mut c) = ctx.bcstm {
-                    c.pause()
+                if let Some(ref mut _c) = ctx.bcstm {
+                    //TODO
                 }
             }
             AudioMessage::Unload => ctx.bcstm = None,
@@ -105,10 +106,8 @@ fn audio_main(rx: Receiver<AudioMessage>) {
             AudioMessage::None => (),
         }
 
-        if let Some(ref mut c) = ctx.bcstm {
-            if !c.tick().unwrap() {
-                break;
-            }
+        if let Some(ref mut _c) = ctx.bcstm {
+            //TODO
         }
     }
 }

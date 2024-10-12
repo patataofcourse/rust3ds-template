@@ -158,7 +158,7 @@ fn run(is_citra: bool) -> error::Result<()> {
         audio_player = audio::AudioManager::new();
 
         // Initial values for audio player
-        audio_player.load("romfs:/audio/strm/Practice.bcstm".to_string());
+        audio_player.load("romfs:/audio/strm/Practice.pcm16".to_string());
         //audio_player.play();
 
         unsafe { AUDIO = Some(&audio_player) }
