@@ -1,0 +1,2 @@
+wav exported by audacity into RAW (headerless) signed 16-bit stereo PCM data. i don't know if it needs to be exported in some other way.
+sample rate is 44100

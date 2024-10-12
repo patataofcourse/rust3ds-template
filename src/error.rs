@@ -5,6 +5,8 @@ use std::{
     io::Error as IoError,
 };
 use toml::{de::Error as TomlDeError, ser::Error as TomlSeError};
+#[cfg(feature = "audio")]
+use ctru::services::ndsp::Error as NdspError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -14,6 +16,8 @@ pub enum Error {
     Io(IoError),
     TomlDe(TomlDeError),
     TomlSer(TomlSeError),
+    #[cfg(feature = "audio")]
+    Ndsp(NdspError),
     Other(String),
 }
 
@@ -28,6 +32,8 @@ impl Display for self::Error {
                 Self::Other(c) => c.to_string(),
                 Self::TomlDe(c) => c.to_string(),
                 Self::TomlSer(c) => c.to_string(),
+                #[cfg(feature = "audio")]
+                Self::Ndsp(c) => c.to_string(),
             }
         )
     }
@@ -56,6 +62,13 @@ impl From<TomlDeError> for self::Error {
 impl From<TomlSeError> for self::Error {
     fn from(err: TomlSeError) -> Self {
         Self::TomlSer(err)
+    }
+}
+
+#[cfg(feature = "audio")]
+impl From<NdspError> for self::Error {
+    fn from(value: NdspError) -> Self {
+        Self::Ndsp(value)
     }
 }
 

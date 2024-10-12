@@ -1,4 +1,4 @@
-#![feature(allocator_api, int_roundings, panic_backtrace_config)]
+#![feature(allocator_api, int_roundings, panic_backtrace_config, seek_stream_len)]
 
 extern crate barista_ui as ui_lib;
 
@@ -8,9 +8,7 @@ use ctru::{
 };
 use error::error_applet;
 use std::{
-    panic::{self, PanicHookInfo},
-    process,
-    time::Duration,
+    fs::File, panic::{self, PanicHookInfo}, process, time::Duration
 };
 use ui_lib::{BaristaUI, Screen};
 
@@ -79,6 +77,10 @@ fn main() {
                 Error::TomlSer(c) => {
                     format!("TOML serialize error: {}", c)
                 }
+                #[cfg(feature = "audio")]
+                Error::Ndsp(c) =>  {
+                    format!("Audio error: {}", c)
+                }
                 Error::Other(c) => c,
             };
             if is_citra {
@@ -137,25 +139,34 @@ fn run(is_citra: bool) -> error::Result<()> {
     let mut ndsp;
 
     #[allow(unused)]
+    let mut pcm;
+
+    #[allow(unused)]
     #[cfg(not(feature = "audio"))]
     {
         audio_player = ();
         ndsp = ();
+        pcm = ();
     }
 
     #[cfg(feature = "audio")]
     {
-        ndsp = Ndsp::new()?;
+        ndsp = Ndsp::new()?; // TODO: handle error gracefully, especially on citra
         ndsp.set_output_mode(ndsp::OutputMode::Stereo);
 
         // Music test
         audio_player = audio::AudioManager::new();
 
         // Initial values for audio player
-        audio_player.load("romfs:/audio/strm/bartender_construction.bcstm".to_string());
-        audio_player.play();
+        audio_player.load("romfs:/audio/strm/Practice.bcstm".to_string());
+        //audio_player.play();
 
         unsafe { AUDIO = Some(&audio_player) }
+
+        
+        pcm = format::pcm::PcmData::new(File::open("romfs:/audio/strm/Practice.pcm16")?, 44100.0, None)?;
+        pcm.init(&mut ndsp)?;
+
     }
 
     // Init Saltwater config
@@ -180,6 +191,9 @@ fn run(is_citra: bool) -> error::Result<()> {
         ui.render();
 
         menu.run(&hid, &console, &versions, &mods, &mut page, &mut settings)?;
+
+        #[cfg(feature = "audio")]
+        pcm.reload_buffers(&ndsp)?;
 
         match &menu.action {
             MenuAction::Exit => break,
